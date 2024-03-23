@@ -28,6 +28,7 @@ func TestAreEqual(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equalf(t, tt.want, AreEqual(tt.args...), "AreEqual(%v)", tt.args)
+			assert.NotEqual(t, AreEqual(tt.args...), AreUnique(tt.args...))
 		})
 	}
 }
@@ -62,7 +63,7 @@ func TestAreEqualValue(t *testing.T) {
 	}
 }
 
-func FuzzEqualValues(f *testing.F) {
+func FuzzEqualValuesTypes(f *testing.F) {
 	var (
 		a int
 		b uint
@@ -70,42 +71,78 @@ func FuzzEqualValues(f *testing.F) {
 		d int16
 		e int32
 		g uint64
+		h byte
 		j float32 = float32(math.NaN())
 		k float64 = math.NaN()
+		l bool
 	)
-	f.Add(a, b, c, d, e, g, j, k)
-	f.Fuzz(func(t *testing.T, a int, b uint, c int8, d int16, e int32, g uint64, j float32, k float64) {
+	f.Add(a, b, c, d, e, g, h, j, k, l)
+	f.Fuzz(func(t *testing.T, a int, b uint, c int8, d int16, e int32, g uint64, h byte, j float32, k float64, l bool) {
 		arr := []any{a, b, c, d, e, g, j, k}
-		if AreEqual(arr...) {
-			assert.True(t, AreEqualValues(arr...))
-		}
 		if AreUniqueValues(arr...) {
 			assert.True(t, AreUnique(arr...))
+			assert.True(t, !AreEqual(arr...))
+			assert.True(t, !AreEqualValues(arr...))
+		}
+		if AreUnique(arr...) {
+			assert.True(t, !AreEqual(arr...))
+			assert.True(t, !AreEqualValues(arr...))
+		}
+		if AreEqual(arr...) {
+			assert.True(t, AreEqualValues(arr...))
+			assert.True(t, !AreUnique(arr...))
 		}
 	})
 }
-func FuzzInt(f *testing.F)     { fuzzEqual[int](f) }
-func FuzzUnt(f *testing.F)     { fuzzEqual[uint](f) }
-func FuzzInt8(f *testing.F)    { fuzzEqual[int8](f) }
-func FuzzInt16(f *testing.F)   { fuzzEqual[int16](f) }
-func FuzzInt32(f *testing.F)   { fuzzEqual[int32](f) }
-func FuzzUint64(f *testing.F)  { fuzzEqual[uint64](f) }
-func FuzzFloat32(f *testing.F) { fuzzEqual[float32](f) }
-func FuzzFloat64(f *testing.F) { fuzzEqual[float64](f) }
-func FuzzString(f *testing.F)  { fuzzEqual[string](f) }
+func FuzzEqualValues(f *testing.F) {
+	var (
+		a, b, c, d, e, g, h, j, k, l int
+	)
+	f.Add(a, b, c, d, e, g, h, j, k, l)
+	f.Fuzz(func(t *testing.T, a, b, c, d, e, g, h, j, k, l int) {
+		arr := []any{a, b, c, d, e, g, j, k}
+		//if assert.True(t, AreEqualValues(arr...)){
+		//	return
+		//}
+		if AreUniqueValues(arr...) {
+			assert.True(t, AreUnique(arr...))
+			assert.True(t, !AreEqual(arr...))
+			assert.True(t, !AreEqualValues(arr...))
+		}
+		if AreUnique(arr...) {
+			assert.True(t, AreUniqueValues(arr...))
+			assert.True(t, !AreEqual(arr...))
+			assert.True(t, !AreEqualValues(arr...))
+		}
+		if AreEqualValues(arr...) {
+			assert.True(t, AreEqual(arr...))
+			assert.True(t, !AreUnique(arr...))
+			assert.True(t, !AreUniqueValues(arr...))
+		}
+	})
+}
+
+func FuzzEqualInt(f *testing.F)     { fuzzEqual[int](f) }
+func FuzzEqualUnt(f *testing.F)     { fuzzEqual[uint](f) }
+func FuzzEqualInt8(f *testing.F)    { fuzzEqual[int8](f) }
+func FuzzEqualInt16(f *testing.F)   { fuzzEqual[int16](f) }
+func FuzzEqualInt32(f *testing.F)   { fuzzEqual[int32](f) }
+func FuzzEqualUint64(f *testing.F)  { fuzzEqual[uint64](f) }
+func FuzzEqualFloat32(f *testing.F) { fuzzEqual[float32](f) }
+func FuzzEqualFloat64(f *testing.F) { fuzzEqual[float64](f) }
+func FuzzEqualString(f *testing.F)  { fuzzEqual[string](f) }
+func FuzzEqualByte(f *testing.F)    { fuzzEqual[byte](f) }
 
 func fuzzEqual[T comparable](f *testing.F) {
 	var (
 		a T
 		b T
+		c T
+		d T
 	)
-	f.Add(a, b)
-	f.Fuzz(func(t *testing.T, a, b T) {
-		if AreEqual(a, b) {
-			assert.True(t, AreEqualValues(a, b))
-		}
-		if AreUniqueValues(a, b) {
-			assert.True(t, AreUnique(a, b))
-		}
+	f.Add(a, b, c, d)
+	f.Fuzz(func(t *testing.T, a, b, c, d T) {
+		assert.Equal(t, AreEqual(a, b, c, d), AreEqualValues(a, b, c, d))
+		assert.Equal(t, AreUnique(a, b, c, d), AreUniqueValues(a, b, c, d))
 	})
 }
