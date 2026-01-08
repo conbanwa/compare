@@ -44,17 +44,17 @@ func TestAreEqualValue(t *testing.T) {
 	}
 	tests := []testCase{
 		{
-			name: "1",
+			name: "nan",
 			args: []any{math.NaN(), math.NaN()},
 			want: false,
 		},
 		{
-			name: "1",
+			name: "6",
 			args: []any{6, 6.0, float32(6), int8(6), uint(6)},
 			want: true,
 		},
 		{
-			name: "1",
+			name: "six",
 			args: []any{6, 6.0, float32(6), int8(6), uint(6), "6"},
 			want: false,
 		},
