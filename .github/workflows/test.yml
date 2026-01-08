@@ -32,8 +32,16 @@ jobs:
     - name: Test
       run: go test -v -race -coverprofile=coverage.out -covermode=atomic -run="^[^F]" ./...
 
-    - name: Fuzz
-      run: go test -v -race -fuzz=^Fuzz -run=^$ ./...
-
     - name: Bench
       run: go test -v -race -bench=.* -benchmem -run=^$ ./...
+      
+    - name: Fuzz
+      run: |
+        # 找出所有的模糊测试函数
+        fuzz_tests=$(go test -list="Fuzz.*" ./... | grep "^Fuzz")
+        
+        # 逐个运行模糊测试
+        for test in $fuzz_tests; do
+          echo "Running fuzz test: $test"
+          go test -v -race -fuzz="$test$" -fuzztime=60s ./...
+        done
