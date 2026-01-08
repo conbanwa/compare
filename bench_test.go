@@ -44,6 +44,6 @@ func BenchmarkGreaterThan(b *testing.B) {
 func BenchmarkGreaterThanEqual(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		j := float64(i)
-		GreaterOrEqual(i)(j)
+		GreaterOrEqual(0.0)(j)
 	}
 }
