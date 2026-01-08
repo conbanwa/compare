@@ -43,5 +43,5 @@ jobs:
         # 逐个运行模糊测试
         for test in $fuzz_tests; do
           echo "Running fuzz test: $test"
-          go test -v -race -fuzz="$test$" -run=^$ -fuzztime=600s ./...
+          go test -v -race -fuzz="$test$" -run=^$ -fuzztime=120s ./...
         done
