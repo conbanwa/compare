@@ -9,8 +9,7 @@ import (
 )
 
 type Logger interface {
-	Error(args ...any)
-	Errorf(format string, args ...any)
+	Logf(format string, args ...any)
 }
 
 // helper to format the full argument list nicely
@@ -39,7 +38,7 @@ func Unique[T comparable](w Logger, args ...T) bool {
 	for i, v := range args {
 		for j := i + 1; j < len(args); j++ {
 			if v == args[j] {
-				w.Errorf("Unique[T] FAILED — duplicate found:\n"+
+				w.Logf("Unique[T] FAILED — duplicate found:\n"+
 					"  Value: %#v\n"+
 					"  Positions: %d and %d\n"+
 					"  Full args: [%s]",
@@ -59,7 +58,7 @@ func Equal[T comparable](w Logger, args ...T) bool {
 	first := args[0]
 	for i := 1; i < len(args); i++ {
 		if first != args[i] {
-			w.Errorf("Equal[T] FAILED — not all equal:\n"+
+			w.Logf("Equal[T] FAILED — not all equal:\n"+
 				"  Expected all to be: %#v\n"+
 				"  Found different: %#v at position %d\n"+
 				"  Full args: [%s]",
@@ -75,7 +74,7 @@ func UniqueValues(w Logger, args ...any) bool {
 	for i, v := range args {
 		for j := i + 1; j < len(args); j++ {
 			if assert.ObjectsAreEqualValues(v, args[j]) {
-				w.Errorf("UniqueValues FAILED — values considered equal:\n"+
+				w.Logf("UniqueValues FAILED — values considered equal:\n"+
 					"  Position %d: %#v\n"+
 					"  Position %d: %#v\n"+
 					"  Full args: [%s]",
@@ -94,7 +93,7 @@ func EqualValues(w Logger, args ...any) bool {
 	}
 	for i := 1; i < len(args); i++ {
 		if !assert.ObjectsAreEqualValues(args[0], args[i]) {
-			w.Errorf("EqualValues FAILED — not all equal:\n"+
+			w.Logf("EqualValues FAILED — not all equal:\n"+
 				"  Expected all like position 0: %#v\n"+
 				"  Found different at position %d: %#v\n"+
 				"  Full args: [%s]",
